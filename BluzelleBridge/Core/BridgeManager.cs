@@ -44,6 +44,9 @@ namespace Bluzelle.NEO.Bridge.Core
             }
 
             this.listenerVM = new SnapshotVM(this);
+
+            // TODO: The last block should persistent between multiple sessions, in order to not miss any block
+            this.lastBlock = neo_api.GetBlockHeight() - 1;
         }
 
         public void Stop()
@@ -54,6 +57,8 @@ namespace Bluzelle.NEO.Bridge.Core
             }
         }
 
+        private uint lastBlock;
+
         public void Run()
         {
             if (running)
@@ -62,17 +67,17 @@ namespace Bluzelle.NEO.Bridge.Core
             }
 
             this.running = true;
-
-            // TODO: The last block should persistent between multiple sessions, in order to not miss any block
-            var lastBlock = neo_api.GetBlockHeight() - 1;
-
+            
             do
             {
                 var currentBlock = neo_api.GetBlockHeight();
                 if (currentBlock > lastBlock)
                 {
-                    ProcessIncomingBlock(currentBlock);
-                    lastBlock = currentBlock;
+                    while (lastBlock < currentBlock)
+                    {
+                        lastBlock++;
+                        ProcessIncomingBlock(lastBlock);
+                    }
                 }
 
                 // sleeps 10 seconds in order to wait some time until next block is generated

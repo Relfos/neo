@@ -1,5 +1,5 @@
 ﻿using Bluzelle.NEO.Bridge.Core;
-using System;
+using Neo.Lux.Utils;
 using System.Collections.Generic;
 
 namespace Bluzelle.NEO.Bridge

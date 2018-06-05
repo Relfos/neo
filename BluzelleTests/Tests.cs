@@ -13,6 +13,7 @@ using Neo.Lux.Debugger;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Bluzelle.NEO.Contract;
+using Bluzelle.NEO.Sharp.Core;
 
 namespace Bluzelle.NEO.Tests
 {
@@ -22,6 +23,7 @@ namespace Bluzelle.NEO.Tests
         public readonly KeyPair owner_keys;
         public readonly KeyPair admin_keys;
         public readonly DebugClient debugger;
+        public readonly ISwarm swarm;
 
         public TestEnviroment()
         {
@@ -39,6 +41,8 @@ namespace Bluzelle.NEO.Tests
                 }
                 Debug.WriteLine(x);
             });
+
+            this.swarm = new TestSwarm();
 
             Transaction tx;
 
@@ -94,6 +98,18 @@ namespace Bluzelle.NEO.Tests
         public void TestCore()
         {
             var env = new TestEnviroment();
+
+            var test_keypair = KeyPair.GenerateAddress();
+
+            var test_key = "test_key";
+            var test_value = "Hello world!";
+
+            var bridge = new BridgeManager(env.api, env.swarm, env.admin_keys.WIF, contract_script_bytes);
+
+            var tx = env.api.CallContract(test_keypair, contract_script_hash, "create", new object[] { test_keypair.address.AddressToScriptHash(), test_key, test_value });
+            Assert.IsNotNull(tx);
+
+            env.api.WaitForTransaction(test_keypair, tx);
 
             //Assert.IsTrue(TODO);
         }

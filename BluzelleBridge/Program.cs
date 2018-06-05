@@ -1,9 +1,7 @@
-﻿using Bluzelle.NEO.Bridge.Core;
-using Neo.Lux.Core;
-using Neo.Lux.Utils;
-using Neo.Lux.Cryptography;
+﻿using Neo.Lux.Core;
 using System;
-using System.Collections.Generic;
+using Bluzelle.NEO.Tests;
+using Bluzelle.NEO.Sharp.Core;
 
 namespace Bluzelle.NEO.Bridge
 {

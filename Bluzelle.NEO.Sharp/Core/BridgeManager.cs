@@ -167,8 +167,8 @@ namespace Bluzelle.NEO.Sharp.Core
                                 throw new Exception($"Swarm.Create expects 3 arguments");
                             }
 
-                            var uuid = (byte[])entry.Args[0];
-                            var key = (byte[])entry.Args[1];
+                            var uuid = Encoding.UTF8.GetString((byte[])entry.Args[0]);
+                            var key = Encoding.UTF8.GetString((byte[])entry.Args[1]);
                             var value = (byte[])entry.Args[2];
 
                             this.swarm.Create(uuid, key, value);
@@ -182,8 +182,8 @@ namespace Bluzelle.NEO.Sharp.Core
                                 throw new Exception($"Swarm.Read expects 2 arguments");
                             }
 
-                            var uuid = (byte[])entry.Args[0];
-                            var key = (byte[])entry.Args[1];
+                            var uuid = Encoding.UTF8.GetString((byte[])entry.Args[0]);
+                            var key = Encoding.UTF8.GetString((byte[])entry.Args[1]);
 
                             var value = this.swarm.Read(uuid, key);
 
@@ -200,8 +200,8 @@ namespace Bluzelle.NEO.Sharp.Core
                                 throw new Exception($"Swarm.Update expects 3 arguments");
                             }
 
-                            var uuid = (byte[])entry.Args[0];
-                            var key = (byte[])entry.Args[1];
+                            var uuid = Encoding.UTF8.GetString((byte[])entry.Args[0]);
+                            var key = Encoding.UTF8.GetString((byte[])entry.Args[1]);
                             var value = (byte[])entry.Args[2];
 
                             this.swarm.Update(uuid, key, value);
@@ -217,8 +217,8 @@ namespace Bluzelle.NEO.Sharp.Core
                                 throw new Exception($"Swarm.Delete expects 2 arguments");
                             }
 
-                            var uuid = (byte[])entry.Args[0];
-                            var key = (byte[])entry.Args[1];
+                            var uuid = Encoding.UTF8.GetString((byte[])entry.Args[0]);
+                            var key = Encoding.UTF8.GetString((byte[])entry.Args[1]);
 
                             this.swarm.Remove(uuid, key);
 

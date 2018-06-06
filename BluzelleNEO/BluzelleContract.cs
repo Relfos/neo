@@ -91,7 +91,7 @@ namespace Bluzelle.NEO.Contract
 
         private static bool API_Create(byte[] scripthash, byte[] key, byte[] value)
         {
-            if (Runtime.CheckWitness(scripthash))
+            if (!Runtime.CheckWitness(scripthash))
             {
                 return false;
             }
@@ -103,7 +103,7 @@ namespace Bluzelle.NEO.Contract
 
         private static bool API_Read(byte[] scripthash, byte[] key)
         {
-            if (Runtime.CheckWitness(scripthash))
+            if (!Runtime.CheckWitness(scripthash))
             {
                 return false;
             }
@@ -115,7 +115,7 @@ namespace Bluzelle.NEO.Contract
 
         private static bool API_Update(byte[] scripthash, byte[] key, byte[] value)
         {
-            if (Runtime.CheckWitness(scripthash))
+            if (!Runtime.CheckWitness(scripthash))
             {
                 return false;
             }
@@ -127,7 +127,7 @@ namespace Bluzelle.NEO.Contract
 
         private static bool API_Delete(byte[] scripthash, byte[] key)
         {
-            if (Runtime.CheckWitness(scripthash))
+            if (!Runtime.CheckWitness(scripthash))
             {
                 return false;
             }
@@ -139,7 +139,7 @@ namespace Bluzelle.NEO.Contract
 
         private static bool API_Push(byte[] key, byte[] value)
         {
-            if (Runtime.CheckWitness(Admin_Address))
+            if (!Runtime.CheckWitness(Admin_Address))
             {
                 return false;
             }
@@ -149,7 +149,7 @@ namespace Bluzelle.NEO.Contract
 
         private static bool API_Pull(byte[] scripthash, byte[] key)
         {
-            if (Runtime.CheckWitness(scripthash))
+            if (!Runtime.CheckWitness(scripthash))
             {
                 return false;
             }

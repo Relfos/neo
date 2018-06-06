@@ -10,6 +10,9 @@ namespace Bluzelle.NEO.Contract
     {
         public static readonly byte[] Admin_Address = "AHKPx5dZYnwAweQUJQH3UefoswKm6beEz2".ToScriptHash();
 
+        private static readonly byte[] request_owner_prefix = { (byte)'R', (byte)'E', (byte)'Q', (byte)'O' };
+        private static readonly byte[] request_count_prefix = { (byte)'R', (byte)'E', (byte)'Q', (byte)'C' };
+
         [DisplayName("blz_create")]
         public static event Action<byte[], byte[], byte[]> OnCreate;
 
@@ -108,6 +111,7 @@ namespace Bluzelle.NEO.Contract
                 return false;
             }
 
+            MakeRequest(scripthash);
             OnRead(scripthash, key);
 
             return true;
@@ -157,6 +161,15 @@ namespace Bluzelle.NEO.Contract
             OnDelete(scripthash, key);
 
             return true;
+        }
+
+        private static void MakeRequest(byte[] scriptHash)
+        {
+            var req_count = Storage.Get(Storage.CurrentContext, request_count_prefix).AsBigInteger();
+            req_count = req_count + 1;
+
+            var req_key = request_owner_prefix.Concat(req_count.AsByteArray());
+            Storage.Put(Storage.CurrentContext, req_key, scriptHash);
         }
     }
 }

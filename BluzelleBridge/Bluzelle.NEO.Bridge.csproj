@@ -9,4 +9,8 @@
     <PackageReference Include="NeoLux" Version="0.7.5" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\BluzelleTests\Bluzelle.NEO.Tests.csproj" />
+  </ItemGroup>
+
 </Project>

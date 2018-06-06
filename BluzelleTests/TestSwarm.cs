@@ -1,14 +1,16 @@
 ﻿using Bluzelle.NEO.Sharp.Core;
 using Neo.Lux.Utils;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Bluzelle.NEO.Tests
 {
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
     public class TestSwarm : ISwarm
     {
-        private Dictionary<byte[], byte[]> storage = new Dictionary<byte[], byte[]>(new ByteArrayComparer());
+        private Dictionary<string, byte[]> storage = new Dictionary<string, byte[]>();
 
-        public bool Create(byte[] uuid, byte[] key, byte[] value)
+        public async Task<bool> Create(string uuid, string key, byte[] value)
         {
             if (storage.ContainsKey(key))
             {
@@ -19,12 +21,12 @@ namespace Bluzelle.NEO.Tests
             return true;
         }
 
-        public byte[] Read(byte[] uuid, byte[] key)
+        public async Task<byte[]> Read(string uuid, string key)
         {
             return storage.ContainsKey(key) ? storage[key] : null;
         }
 
-        public bool Remove(byte[] uuid, byte[] key)
+        public async Task<bool> Remove(string uuid, string key)
         {
             if (storage.ContainsKey(key))
             {
@@ -35,7 +37,7 @@ namespace Bluzelle.NEO.Tests
             return false;
         }
 
-        public bool Update(byte[] uuid, byte[] key, byte[] value)
+        public async Task<bool> Update(string uuid, string key, byte[] value)
         {
             if (storage.ContainsKey(key))
             {
@@ -46,4 +48,5 @@ namespace Bluzelle.NEO.Tests
             return false;
         }
     }
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
 }

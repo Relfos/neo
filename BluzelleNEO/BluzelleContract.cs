@@ -81,7 +81,7 @@ namespace Bluzelle.NEO.Contract
                     return API_Push(id, value);
                 }
 
-                if (operation == "check")
+                if (operation == "pull")
                 {
                     if (args.Length != 1) return false;
                     BigInteger id = (BigInteger)args[0];

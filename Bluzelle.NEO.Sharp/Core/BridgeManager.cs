@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -26,6 +27,8 @@ namespace Bluzelle.NEO.Sharp.Core
         private KeyPair owner_keys;
 
         private Dictionary<UInt256, Transaction> transactions = new Dictionary<UInt256, Transaction>();
+
+        private BigInteger lastRequestID = 0;
 
         public BridgeManager(NeoAPI api, ISwarm swarm, string ownerWIF, string contractPath, uint lastBlock) : this(api, swarm, ownerWIF, File.ReadAllBytes(contractPath), lastBlock)
         {
@@ -145,7 +148,9 @@ namespace Bluzelle.NEO.Sharp.Core
                             }*/
                             );
 
-                        ProcessNotifications(tx);
+                        ProcessRequests(tx);
+
+                        break;
                     }
                 }
 
@@ -154,88 +159,78 @@ namespace Bluzelle.NEO.Sharp.Core
         }
 
         /// <summary>
-        /// Catches and processes all notifications triggered in a Neo transaction
+        /// Catches and processes all requests created by a Neo transaction
         /// </summary>
         /// <param name="tx"></param>
-        private void ProcessNotifications(Transaction tx)
+        private void ProcessRequests(Transaction tx)
         {
             // add the transaction to the cache
             transactions[tx.Hash] = tx;
 
-            var notifications = listenerVM.GetNotifications(tx);
-            if (notifications == null)
+            var storage = listenerVM.GetStorage(bluzelle_contract_hash);
+
+            var bytes = storage.Get("REQC");
+            var reqCount = new BigInteger(bytes);
+
+            while (lastRequestID < reqCount)
             {
-                return;
+                lastRequestID++;
+                ProcessRequest(storage, lastRequestID);
             }
+        }
 
-            foreach (var entry in notifications)
+        private static readonly byte[] request_owner_prefix = { (byte)'R', (byte)'E', (byte)'Q', (byte)'O' };
+        private static readonly byte[] request_key_prefix = { (byte)'R', (byte)'E', (byte)'Q', (byte)'K' };
+        private static readonly byte[] request_value_prefix = { (byte)'R', (byte)'E', (byte)'Q', (byte)'V' };
+        private static readonly byte[] request_uuid_prefix = { (byte)'R', (byte)'E', (byte)'Q', (byte)'U' };
+
+        /// <summary>
+        /// Fetches a request from the contract storage and processes it.
+        /// </summary>
+        private void ProcessRequest(Storage storage, BigInteger ID)
+        {
+            var base_key = ID.ToByteArray();
+
+            var req_owner_key = request_owner_prefix.Concat(base_key).ToArray();
+            var req_key_key = request_key_prefix.Concat(base_key).ToArray();
+            var req_uuid_key = request_key_prefix.Concat(base_key).ToArray();
+            var req_val_key = request_value_prefix.Concat(base_key).ToArray();
+
+            var uuid = Encoding.UTF8.GetString(storage.Get(req_uuid_key));
+            var value = storage.Get(req_val_key);
+            var temp = storage.Get(req_key_key);
+            var operation = (char) temp[0];
+            var key = Encoding.UTF8.GetString(temp.Skip(1).ToArray());
+
+            switch (operation)
             {
-                switch (entry.Name)
-                {
-                    case "blz_create":{
-                            if (entry.Args.Length != 3)
-                            {
-                                throw new Exception($"Swarm.Create expects 3 arguments");
-                            }
-
-                            var uuid = Encoding.UTF8.GetString((byte[])entry.Args[0]);
-                            var key = Encoding.UTF8.GetString((byte[])entry.Args[1]);
-                            var value = (byte[])entry.Args[2];
-
-                            this.swarm.Create(uuid, key, value);
-                            break;
+                case 'C':
+                    {
+                        this.swarm.Create(uuid, key, value);
+                        break;
                     }
 
-                    case "blz_read":
-                        {
-                            if (entry.Args.Length != 2)
-                            {
-                                throw new Exception($"Swarm.Read expects 2 arguments");
-                            }
+                case 'R':
+                    {
+                        var read = this.swarm.Read(uuid, key);
 
-                            var uuid = Encoding.UTF8.GetString((byte[])entry.Args[0]);
-                            var key = Encoding.UTF8.GetString((byte[])entry.Args[1]);
+                        var push_tx = neo_api.CallContract(owner_keys, bluzelle_contract_hash, "api_push", new object[] { uuid, key, read });
+                        neo_api.WaitForTransaction(owner_keys, push_tx);
 
-                            var value = this.swarm.Read(uuid, key);
+                        break;
+                    }
 
-                            var push_tx = neo_api.CallContract(owner_keys, bluzelle_contract_hash, "api_push", new object[] {uuid, key, value });
+                case 'U':
+                    {
+                        this.swarm.Update(uuid, key, value);
 
-                            neo_api.WaitForTransaction(owner_keys, push_tx);
-                            break;
-                        }
+                        break;
+                    }
 
-                    case "blz_update":
-                        {
-                            if (entry.Args.Length != 3)
-                            {
-                                throw new Exception($"Swarm.Update expects 3 arguments");
-                            }
-
-                            var uuid = Encoding.UTF8.GetString((byte[])entry.Args[0]);
-                            var key = Encoding.UTF8.GetString((byte[])entry.Args[1]);
-                            var value = (byte[])entry.Args[2];
-
-                            this.swarm.Update(uuid, key, value);
-                         
-                            //  public static event Action<byte[], byte[], byte[]> OnUpdate;
-                            break;
-                        }
-
-                    case "blz_delete":
-                        {
-                            if (entry.Args.Length != 2)
-                            {
-                                throw new Exception($"Swarm.Delete expects 2 arguments");
-                            }
-
-                            var uuid = Encoding.UTF8.GetString((byte[])entry.Args[0]);
-                            var key = Encoding.UTF8.GetString((byte[])entry.Args[1]);
-
-                            this.swarm.Remove(uuid, key);
-
-                            break;
-                        }
-
+                case 'D':
+                    {
+                        this.swarm.Remove(uuid, key);
+                        break;
                     }
             }
         }

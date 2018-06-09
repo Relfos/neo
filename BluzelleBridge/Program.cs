@@ -16,7 +16,7 @@ namespace Bluzelle.NEO.Bridge
             Console.WriteLine("Running Bluzelle NEO bridge...");
 
             // test public address = AHKPx5dZYnwAweQUJQH3UefoswKm6beEz2
-            var manager = new BridgeManager(api, new TestSwarm(), "L3Vo5HcJhDoL7s81i4PSDTPfbUpVPrFHQ3V1GwSESkQtF4LW2vvJ", @"..\..\bin\Debug\BluzelleContract.avm");
+            var manager = new BridgeManager(api, new TestSwarm(), "L3Vo5HcJhDoL7s81i4PSDTPfbUpVPrFHQ3V1GwSESkQtF4LW2vvJ", @"..\..\bin\Debug\BluzelleContract.avm", api.GetBlockHeight() - 1);
             manager.Run();
         }
     }

@@ -5,7 +5,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="LunarParser" Version="1.0.33" />
     <PackageReference Include="NeoLux" Version="0.7.5" />
+    <PackageReference Include="WebSocketSharp-netstandard" Version="1.0.1" />
   </ItemGroup>
 
 </Project>

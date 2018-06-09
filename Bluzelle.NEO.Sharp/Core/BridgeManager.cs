@@ -27,12 +27,12 @@ namespace Bluzelle.NEO.Sharp.Core
 
         private Dictionary<UInt256, Transaction> transactions = new Dictionary<UInt256, Transaction>();
 
-        public BridgeManager(NeoAPI api, ISwarm swarm, string ownerWIF, string contractPath) : this(api, swarm, ownerWIF, File.ReadAllBytes(contractPath))
+        public BridgeManager(NeoAPI api, ISwarm swarm, string ownerWIF, string contractPath, uint lastBlock) : this(api, swarm, ownerWIF, File.ReadAllBytes(contractPath), lastBlock)
         {
 
         }
 
-        public BridgeManager(NeoAPI api, ISwarm swarm, string ownerWIF, byte[] contract_bytes)
+        public BridgeManager(NeoAPI api, ISwarm swarm, string ownerWIF, byte[] contract_bytes, uint lastBlock)
         {
             this.neo_api = api;
             this.swarm = swarm;
@@ -44,7 +44,7 @@ namespace Bluzelle.NEO.Sharp.Core
             this.listenerVM = new SnapshotVM(this);
 
             // TODO: The last block should persistent between multiple sessions, in order to not miss any block
-            this.lastBlock = neo_api.GetBlockHeight() - 1;
+            this.lastBlock = lastBlock;
         }
 
         public void Stop()
@@ -57,7 +57,7 @@ namespace Bluzelle.NEO.Sharp.Core
 
         private uint lastBlock;
 
-        public void Run()
+        public void Run(uint blockCount = 0)
         {
             if (running)
             {
@@ -65,6 +65,8 @@ namespace Bluzelle.NEO.Sharp.Core
             }
 
             this.running = true;
+
+            bool forever = (blockCount == 0);
             
             do
             {
@@ -75,6 +77,15 @@ namespace Bluzelle.NEO.Sharp.Core
                     {
                         lastBlock++;
                         ProcessIncomingBlock(lastBlock);
+
+                        if (!forever)
+                        {
+                            blockCount--;
+                            if (blockCount == 0)
+                            {
+                                return;
+                            }
+                        }
                     }
                 }
 

@@ -32,46 +32,50 @@ namespace Bluzelle.NEO.Sharp.Core
             this.url = url;
         }
 
-        private async Task<string> DoRequest(WSRequest request)
+        private string BuildRequest(WSRequest request)
         {
-            request_id++;
+            var root = DataNode.CreateObject();
+            root.AddField("bzn-api", "crud");
+            root.AddField("cmd", request.command.ToString().ToLower());
 
+            var node = DataNode.CreateObject("data");
+            foreach (var entry in request.data)
+            {
+                node.AddField(entry.Key, entry.Value);
+            }
+            root.AddNode(node);
+
+            root.AddField("db-uuid", request.uuid);
+            root.AddField("request-id", request_id);
+
+            var json = JSONWriter.WriteToString(root);
+
+            return json;
+        }
+
+        private async Task<string> SendRequestToSocket(string json)
+        {
             string response = null;
-            bool error = false;
+            bool failed = false;
 
             using (var ws = new WebSocket(url))
             {
                 ws.OnError += (sender, e) =>
                 {
-                    error = true;
+                    failed = true;
                     //Console.WriteLine("error: " + e.ToString());
                 };
 
                 ws.OnMessage += (sender, e) =>
-                    {
-                        response = e.Data;
-                    };
+                {
+                    response = e.Data;
+                };
 
                 /*ws.OnClose += (sender, e) =>
                 {
                     Console.WriteLine("closed socket");
                 };*/
 
-                var root = DataNode.CreateObject();
-                root.AddField("bzn-api", "crud");
-                root.AddField("cmd", request.command.ToString().ToLower());
-
-                var node = DataNode.CreateObject("data");
-                foreach (var entry in request.data)
-                {
-                    node.AddField(entry.Key, entry.Value);
-                }
-                root.AddNode(node);
-
-                root.AddField("db-uuid", request.uuid);
-                root.AddField("request-id", request_id);
-
-                var json = JSONWriter.WriteToString(root);
 
                 System.IO.File.WriteAllText("dump.json", json);
                 ws.Connect();
@@ -89,7 +93,7 @@ namespace Bluzelle.NEO.Sharp.Core
                 while (response == null)
                 {
                     await Task.Delay(100);
-                    if (error)
+                    if (failed)
                     {
                         return null;
                     }
@@ -97,6 +101,37 @@ namespace Bluzelle.NEO.Sharp.Core
 
                 return response;
             }
+        }
+
+        private async Task<string> DoRequest(WSRequest request)
+        {
+            request_id++;
+
+            var json = BuildRequest(request);
+
+            var response = await SendRequestToSocket(json);
+
+            if (response == null)
+            {
+                return null;
+            }
+
+            var root = JSONReader.ReadFromString(response);
+            if (root.HasNode("error"))
+            {
+                var error = root.GetString("error");
+                if (error == "NOT_THE_LEADER")
+                {
+                    var data = root["data"];
+                    var leaderHost = data.GetString("leader-host");
+                    var leaderPort = data.GetInt32("leader-port");
+                    this.url = $"ws://{leaderHost}:{leaderPort}";
+
+                    return await SendRequestToSocket(json);
+                }
+            }
+
+            return response;
         }
 
         public async Task<bool> Create(string uuid, string key, string value)
@@ -150,7 +185,7 @@ namespace Bluzelle.NEO.Sharp.Core
             args["value"] = value;
             //args["value"] = Convert.ToBase64String(value);
 
-            var request = new WSRequest() { command = WSRequest.Command.Create, data = args, uuid = uuid };
+            var request = new WSRequest() { command = WSRequest.Command.Update, data = args, uuid = uuid };
             var response = await DoRequest(request);
             return response != null && !response.Contains("error");
         }

@@ -29,27 +29,39 @@ namespace Bluzelle.NEO.Sharp.Core
 
         public WSSwarm(string url)
         {
-
+            this.url = url;
         }
 
-        private async Task<bool> DoRequest(WSRequest request)
+        private async Task<string> DoRequest(WSRequest request)
         {
             request_id++;
 
             string response = null;
+            bool error = false;
 
             using (var ws = new WebSocket(url))
             {
+                ws.OnError += (sender, e) =>
+                {
+                    error = true;
+                    //Console.WriteLine("error: " + e.ToString());
+                };
+
                 ws.OnMessage += (sender, e) =>
                     {
                         response = e.Data;
                     };
 
+                /*ws.OnClose += (sender, e) =>
+                {
+                    Console.WriteLine("closed socket");
+                };*/
+
                 var root = DataNode.CreateObject();
                 root.AddField("bzn-api", "crud");
                 root.AddField("cmd", request.command.ToString().ToLower());
 
-                var node = DataNode.CreateArray("data");
+                var node = DataNode.CreateObject("data");
                 foreach (var entry in request.data)
                 {
                     node.AddField(entry.Key, entry.Value);
@@ -61,36 +73,63 @@ namespace Bluzelle.NEO.Sharp.Core
 
                 var json = JSONWriter.WriteToString(root);
 
+                System.IO.File.WriteAllText("dump.json", json);
                 ws.Connect();
-                ws.Send(json);                
+
+                try
+                {
+                    ws.Send(json);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    return null;
+                }
 
                 while (response == null)
                 {
                     await Task.Delay(100);
+                    if (error)
+                    {
+                        return null;
+                    }
                 }
 
-                // TODO better error handling
-                return !response.Contains("error");
+                return response;
             }
         }
 
-        public async Task<bool> Create(string uuid, string key, byte[] value)
+        public async Task<bool> Create(string uuid, string key, string value)
         {
             var args = new Dictionary<string, string>();
             args["key"] = key;
-            args["value"] = Convert.ToBase64String(value);
+            //args["value"] = Convert.ToBase64String(value);
+            args["value"] = value;
 
             var request = new WSRequest() { command = WSRequest.Command.Create, data = args, uuid = uuid };
-            return await DoRequest(request);
+            var response = await DoRequest(request);
+            return response != null && !response.Contains("error");
         }
 
-        public async Task<byte[]> Read(string uuid, string key)
+        public async Task<string> Read(string uuid, string key)
         {
             var args = new Dictionary<string, string>();
             args["key"] = key;
 
             var request = new WSRequest() { command = WSRequest.Command.Read, data = args, uuid = uuid };
-            //return await DoRequest(request);
+            var json = await DoRequest(request);            
+            if (json == null)
+            {
+                return null;
+            }
+
+            var root = JSONReader.ReadFromString(json);
+            if (root.HasNode("data"))
+            {
+                var data = root["data"];
+                return data.GetString("value");
+            }
+
             return null;
         }
 
@@ -100,17 +139,20 @@ namespace Bluzelle.NEO.Sharp.Core
             args["key"] = key;
 
             var request = new WSRequest() { command = WSRequest.Command.Remove, data = args, uuid = uuid };
-            return await DoRequest(request);
+            var response = await DoRequest(request);
+            return response != null && !response.Contains("error");
         }
 
-        public async Task<bool> Update(string uuid, string key, byte[] value)
+        public async Task<bool> Update(string uuid, string key, string value)
         {
             var args = new Dictionary<string, string>();
             args["key"] = key;
-            args["value"] = Convert.ToBase64String(value);
+            args["value"] = value;
+            //args["value"] = Convert.ToBase64String(value);
 
             var request = new WSRequest() { command = WSRequest.Command.Create, data = args, uuid = uuid };
-            return await DoRequest(request);
+            var response = await DoRequest(request);
+            return response != null && !response.Contains("error");
         }
     }
 }

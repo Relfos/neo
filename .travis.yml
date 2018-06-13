@@ -1,0 +1,10 @@
+language: csharp
+solution: BluzelleNEO.sln
+mono:
+  - 5.4.1
+install:
+  - nuget restore Neo.Lux.sln
+  - nuget install NUnit.Runners -Version 3.2.0 -OutputDirectory testrunner
+script:
+  - xbuild /p:Configuration=Debug BluzelleNEO.sln
+  - mono ./testrunner/NUnit.Runners.2.6.4/tools/nunit-console.exe ./BluzelleTests/bin/Debug/BluzelleTests.dll  

@@ -104,14 +104,17 @@ namespace Bluzelle.NEO.Tests
             var test_key = "test_key";
             var test_value = "Hello world!";
 
-            var bridge = new BridgeManager(env.api, env.swarm, env.admin_keys.WIF, contract_script_bytes);
+            var bridge = new BridgeManager(env.api, env.swarm, env.admin_keys.WIF, contract_script_bytes, env.api.GetBlockHeight());
 
             var tx = env.api.CallContract(test_keypair, contract_script_hash, "create", new object[] { test_keypair.address.AddressToScriptHash(), test_key, test_value });
             Assert.IsNotNull(tx);
 
             env.api.WaitForTransaction(test_keypair, tx);
 
-            //Assert.IsTrue(TODO);
+            // run for a single block
+            bridge.Run(1);
+            
+            //env.swarm.Read(env.ui)
         }
     }
 }

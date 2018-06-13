@@ -8,9 +8,9 @@ namespace Bluzelle.NEO.Tests
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
     public class TestSwarm : ISwarm
     {
-        private Dictionary<string, byte[]> storage = new Dictionary<string, byte[]>();
+        private Dictionary<string, string> storage = new Dictionary<string, string>();
 
-        public async Task<bool> Create(string uuid, string key, byte[] value)
+        public async Task<bool> Create(string uuid, string key, string value)
         {
             if (storage.ContainsKey(key))
             {
@@ -21,7 +21,7 @@ namespace Bluzelle.NEO.Tests
             return true;
         }
 
-        public async Task<byte[]> Read(string uuid, string key)
+        public async Task<string> Read(string uuid, string key)
         {
             return storage.ContainsKey(key) ? storage[key] : null;
         }
@@ -37,7 +37,7 @@ namespace Bluzelle.NEO.Tests
             return false;
         }
 
-        public async Task<bool> Update(string uuid, string key, byte[] value)
+        public async Task<bool> Update(string uuid, string key, string value)
         {
             if (storage.ContainsKey(key))
             {

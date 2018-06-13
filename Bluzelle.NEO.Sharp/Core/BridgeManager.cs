@@ -10,7 +10,6 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Bluzelle.NEO.Sharp.Core
 {
@@ -197,7 +196,7 @@ namespace Bluzelle.NEO.Sharp.Core
             var req_val_key = request_value_prefix.Concat(base_key).ToArray();
 
             var uuid = Encoding.UTF8.GetString(storage.Get(req_uuid_key));
-            var value = storage.Get(req_val_key);
+            var value = Encoding.ASCII.GetString(storage.Get(req_val_key));
             var temp = storage.Get(req_key_key);
             var operation = (char) temp[0];
             var key = Encoding.UTF8.GetString(temp.Skip(1).ToArray());

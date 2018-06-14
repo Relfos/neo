@@ -4,7 +4,8 @@ sudo: required
 mono: none
 dotnet: 2.0.0
 install:
-  - unzip /Build/avm_compiler.zip -d /NEO/
+  - ls
+  - unzip Build/avm_compiler.zip -d /NEO/
   - export PATH="/NEO/;$PATH"    
 script:
   - dotnet restore

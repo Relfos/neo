@@ -5,9 +5,6 @@ mono: latest
 dotnet: 2.0.0
 install:
   - unzip Build/avm_compiler.zip -d $TRAVIS_BUILD_DIR/
-  - cp Build/neon neon
-  - chmod +x neon
-  - export PATH="$PATH:."
 script:
   - dotnet restore
   - dotnet build

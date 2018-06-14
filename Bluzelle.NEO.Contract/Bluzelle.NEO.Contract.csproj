@@ -10,7 +10,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="neon $(TargetDir)BluzelleContract.dll -nodebug" />
+    <Exec Command="echo $(OS)&#xD;&#xA;if $(OS) == Unix goto :mono&#xD;&#xA;neon $(TargetDir)BluzelleContract.dll -nodebug&#xD;&#xA;goto :exit&#xD;&#xA;:mono&#xD;&#xA;mono neon $(TargetDir)BluzelleContract.dll -nodebug&#xD;&#xA;:exit" />
   </Target>
 
 </Project>

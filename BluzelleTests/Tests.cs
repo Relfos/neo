@@ -1,17 +1,15 @@
 ﻿using System;
 using System.IO;
 
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 using System.Linq;
 using Neo.Lux.Core;
 using Neo.Lux.Utils;
 using Neo.Lux.Cryptography;
-using Neo.SmartContract;
 using System.Diagnostics;
 using System.Numerics;
 using Neo.Lux.Debugger;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Bluzelle.NEO.Contract;
 using Bluzelle.NEO.Sharp.Core;
 
@@ -64,7 +62,7 @@ namespace Bluzelle.NEO.Tests
         }
     }
 
-    [TestFixture]
+    [TestClass]
     public class ContractTests
     {
         public static byte[] contract_script_bytes { get; set; }
@@ -72,10 +70,11 @@ namespace Bluzelle.NEO.Tests
 
         private string contract_folder;
 
-        [OneTimeSetUp]
+        [TestInitialize]
         public void FixtureSetUp()
         {
-            var temp = TestContext.CurrentContext.TestDirectory.Split(new char[] { '\\', '/' }).ToList();
+            //var temp = TestContext.CurrentContext.TestDirectory.Split(new char[] { '\\', '/' }).ToList();
+            var temp = Directory.GetCurrentDirectory().Split(new char[] { '\\', '/' }).ToList();
 
             for (int i = 0; i < 3; i++)
             {
@@ -88,13 +87,15 @@ namespace Bluzelle.NEO.Tests
 
             contract_folder = String.Join("\\", temp.ToArray());
 
+            Console.WriteLine("!!!!!!!!!!!!!Loading at " + contract_folder);
+
             contract_script_bytes = File.ReadAllBytes(contract_folder + "/BluzelleContract.avm");
             contract_script_hash = contract_script_bytes.ToScriptHash();
 
             Assert.IsNotNull(contract_script_bytes);
         }
 
-        [Test]
+        [TestMethod]
         public void TestCore()
         {
             var env = new TestEnviroment();

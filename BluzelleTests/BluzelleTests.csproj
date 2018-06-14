@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Bluzelle.NEO.Contract\Bluzelle.NEO.Contract.csproj" />
     <ProjectReference Include="..\Bluzelle.NEO.Sharp\Bluzelle.NEO.Sharp.csproj" />
   </ItemGroup>
 

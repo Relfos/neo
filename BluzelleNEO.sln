@@ -9,6 +9,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bluzelle.NEO.Sharp", "Bluze
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bluzelle.NEO.Helper", "Bluzelle.NEO.Helper\Bluzelle.NEO.Helper.csproj", "{EE769AE1-86B7-428B-B4AB-BDD021439548}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bluzelle.NEO.Contract", "Bluzelle.NEO.Contract\Bluzelle.NEO.Contract.csproj", "{8EDD6BA3-6FC8-4CB3-A8D7-18D73E8239ED}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BluzelleTests", "BluzelleTests\BluzelleTests.csproj", "{762829B1-7A35-4B0F-9C89-5BD95F502306}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +31,14 @@ Global
 		{EE769AE1-86B7-428B-B4AB-BDD021439548}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EE769AE1-86B7-428B-B4AB-BDD021439548}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EE769AE1-86B7-428B-B4AB-BDD021439548}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8EDD6BA3-6FC8-4CB3-A8D7-18D73E8239ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8EDD6BA3-6FC8-4CB3-A8D7-18D73E8239ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8EDD6BA3-6FC8-4CB3-A8D7-18D73E8239ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8EDD6BA3-6FC8-4CB3-A8D7-18D73E8239ED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{762829B1-7A35-4B0F-9C89-5BD95F502306}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{762829B1-7A35-4B0F-9C89-5BD95F502306}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{762829B1-7A35-4B0F-9C89-5BD95F502306}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{762829B1-7A35-4B0F-9C89-5BD95F502306}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

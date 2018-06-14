@@ -49,11 +49,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="build.tasks" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="Build.tasks" />
   <PropertyGroup>
     <PostBuildEvent>neon.exe $(TargetDir)\BluzelleContract.dll</PostBuildEvent>
   </PropertyGroup>

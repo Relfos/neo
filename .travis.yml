@@ -1,10 +1,8 @@
 language: csharp
 solution: BluzelleNEO.sln
-mono:
-  - 5.4.1
 install:
   - nuget restore BluzelleNEO.sln
-  - nuget install NUnit.Runners -Version 3.2.0 -OutputDirectory testrunner
+  - nuget install xunit.runners -Version 1.9.2 -OutputDirectory testrunner
 script:
-  - xbuild /p:Configuration=Debug BluzelleNEO.sln
-  - mono ./testrunner/NUnit.ConsoleRunner.3.2.0/tools/nunit3-console.exe ./BluzelleTests/bin/Debug/BluzelleTests.dll
+  - xbuild /p:Configuration=Release BluzelleNEO.sln
+  - mono ./testrunner/xunit.runners.1.9.2/tools/xunit.console.clr4.exe ./BluzelleTests/bin/Release/BluzelleTests.dll

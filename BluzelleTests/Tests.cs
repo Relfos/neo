@@ -74,18 +74,7 @@ namespace Bluzelle.NEO.Tests
         public void FixtureSetUp()
         {
             //var temp = TestContext.CurrentContext.TestDirectory.Split(new char[] { '\\', '/' }).ToList();
-            var temp = Directory.GetCurrentDirectory().Split(new char[] { '\\', '/' }).ToList();
-
-            for (int i = 0; i < 3; i++)
-            {
-                temp.RemoveAt(temp.Count - 1);
-            }
-
-            temp.Add("BluzelleContract");
-            temp.Add("bin");
-            temp.Add("Debug");
-
-            contract_folder = String.Join("\\", temp.ToArray());
+            var contract_folder = Directory.GetCurrentDirectory().Replace("BluzelleTests", "Bluzelle.NEO.Contract");
 
             Console.WriteLine("!!!!!!!!!!!!!Loading at " + contract_folder);
 

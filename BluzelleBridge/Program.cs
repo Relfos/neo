@@ -1,7 +1,7 @@
 ﻿using Neo.Lux.Core;
 using System;
-using Bluzelle.NEO.Tests;
 using Bluzelle.NEO.Sharp.Core;
+using Bluzelle.NEO.Tests;
 
 namespace Bluzelle.NEO.Bridge
 {

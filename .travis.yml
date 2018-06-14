@@ -4,7 +4,6 @@ sudo: required
 mono: none
 dotnet: 2.0.0
 install:
-  - ls
   - unzip Build/avm_compiler.zip -d $TRAVIS_BUILD_DIR/NEO/
   - export PATH="$TRAVIS_BUILD_DIR/NEO/;$PATH"    
 script:

@@ -5,10 +5,11 @@ mono: latest
 dotnet: 2.0.0
 install:
   - unzip Build/avm_compiler.zip -d $TRAVIS_BUILD_DIR/
+  - echo '#!/bin/sh' > neon
+  - echo 'mono neon.exe "$@" >> neon
   - ls
   - export PATH="$TRAVIS_BUILD_DIR/NEO/;$PATH"    
 script:
   - dotnet restore
   - dotnet build
-  - mono neon.exe $TRAVIS_BUILD_DIR/Bluzelle.NEO.Contract/bin/Debug/netcoreapp2.0/BluzelleContract.dll -nodebug  
   - dotnet test

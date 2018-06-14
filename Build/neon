@@ -1,2 +1,2 @@
 #!/bin/sh
-exec /usr/etc/mono neon.exe "$@"
+exec mono neon.exe "$@"

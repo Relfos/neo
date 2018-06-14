@@ -9,8 +9,6 @@
     <PackageReference Include="Neo.SmartContract.Framework" Version="2.7.3" />
   </ItemGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="echo $(OS)&#xD;&#xA;if $(OS) == Unix goto :mono&#xD;&#xA;neon $(TargetDir)BluzelleContract.dll -nodebug&#xD;&#xA;goto :exit&#xD;&#xA;:mono&#xD;&#xA;mono neon $(TargetDir)BluzelleContract.dll -nodebug&#xD;&#xA;:exit" />
-  </Target>
-
+	<Exec Condition=" '$(OS)' == 'Windows_NT'">neon $(TargetDir)BluzelleContract.dll -nodebug</Exec>
+	<Exec Condition=" '$(OS)' != 'Windows_NT'">mono neon $(TargetDir)BluzelleContract.dll -nodebug</Exec>  
 </Project>

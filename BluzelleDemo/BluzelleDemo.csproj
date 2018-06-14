@@ -51,16 +51,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="build.tasks" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Neo.ConvertTask.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="Build.tasks" />
-  <Target Name="AfterBuild">
-    <Message Text="Start NeoContract converter, Source File: $(TargetPath)" Importance="high">
-    </Message>
-    <ConvertTask DataSource="$(TargetPath)" />
-  </Target>
+  <PropertyGroup>
+    <PostBuildEvent>neon.exe $(TargetDir)\BluzelleDemo.dll</PostBuildEvent>
+  </PropertyGroup>  
 </Project>

@@ -12,7 +12,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Bluzelle.NEO.Sharp\Bluzelle.NEO.Sharp.csproj" />
-    <ProjectReference Include="..\BluzelleNEO\Bluzelle.NEO.Contract.csproj" />
   </ItemGroup>
 
 </Project>

@@ -10,7 +10,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="neon.exe $(TargetDir)\BluzelleContract.dll -nodebug" />
+    <Exec Command="neon.exe $(TargetDir)BluzelleContract.dll -nodebug" />
   </Target>
 
 </Project>

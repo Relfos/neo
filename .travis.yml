@@ -6,8 +6,9 @@ dotnet: 2.0.0
 install:
   - unzip Build/avm_compiler.zip -d $TRAVIS_BUILD_DIR/
   - cp Build/neon neon
-  - ls
+  - chmod +x neon
 script:
   - dotnet restore
   - dotnet build
+  - neon $TRAVIS_BUILD_DIR/Bluzelle.NEO.Contract/bin/Debug/netcoreapp2.0/BluzelleContract.dll -nodebug
   - dotnet test

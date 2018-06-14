@@ -9,6 +9,8 @@
     <PackageReference Include="Neo.SmartContract.Framework" Version="2.7.3" />
   </ItemGroup>
 
-	<Exec Condition=" '$(OS)' == 'Windows_NT'">neon $(TargetDir)BluzelleContract.dll -nodebug</Exec>
-	<Exec Condition=" '$(OS)' != 'Windows_NT'">mono neon $(TargetDir)BluzelleContract.dll -nodebug</Exec>  
+	<Target Name="CompileAVM">
+		<Exec Condition=" '$(OS)' == 'Windows_NT'" Command="neon $(TargetDir)BluzelleContract.dll -nodebug"/>
+		<Exec Condition=" '$(OS)' != 'Windows_NT'" Command="mono neon $(TargetDir)BluzelleContract.dll -nodebug"/>  
+	</Target>	
 </Project>

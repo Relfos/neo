@@ -1,7 +1,7 @@
 language: csharp
 solution: BluzelleNEO.sln
 sudo: required
-mono: none
+mono: latest
 dotnet: 2.0.0
 install:
   - unzip Build/avm_compiler.zip -d $TRAVIS_BUILD_DIR/NEO/
@@ -9,4 +9,5 @@ install:
 script:
   - dotnet restore
   - dotnet build
+  - mono neon.exe $TRAVIS_BUILD_DIR/Bluzelle.NEO.Contract/bin/Debug/netcoreapp2.0/BluzelleContract.dll -nodebug  
   - dotnet test

@@ -6,6 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="..\Bluzelle.NEO.Contract\BluzelleContract.cs" Link="BluzelleContract.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.7.2" />
     <PackageReference Include="MSTest.TestAdapter" Version="1.3.2" />
     <PackageReference Include="MSTest.TestFramework" Version="1.3.2" />
@@ -13,7 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Bluzelle.NEO.Contract\Bluzelle.NEO.Contract.csproj" />
     <ProjectReference Include="..\Bluzelle.NEO.Sharp\Bluzelle.NEO.Sharp.csproj" />
   </ItemGroup>
 

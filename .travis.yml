@@ -5,6 +5,7 @@ mono: latest
 dotnet: 2.0.0
 install:
   - unzip Build/avm_compiler.zip -d $TRAVIS_BUILD_DIR/
+  - sudo apt-get -y install tree
 script:
   - dotnet restore
   - dotnet build

@@ -9,5 +9,5 @@ install:
 script:
   - dotnet restore
   - dotnet build
-  - tree -d $TRAVIS_BUILD_DIR
+  - tree $TRAVIS_BUILD_DIR
   - dotnet test

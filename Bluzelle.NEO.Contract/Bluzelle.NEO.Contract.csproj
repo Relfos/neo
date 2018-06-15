@@ -11,6 +11,6 @@
 
 	<Target Name="CompileAVM">
 		<Exec Condition=" '$(OS)' == 'Windows_NT'" Command="neon $(TargetDir)BluzelleContract.dll -nodebug"/>
-		<Exec Condition=" '$(OS)' != 'Windows_NT'" Command="mono neon $(TargetDir)BluzelleContract.dll -nodebug"/>  
+		<Exec Condition=" '$(OS)' != 'Windows_NT'" Command="mono neon.exe $(TargetDir)BluzelleContract.dll -nodebug"/>  
 	</Target>	
 </Project>

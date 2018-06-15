@@ -9,6 +9,6 @@ install:
 script:
   - dotnet restore
   - dotnet build
-  - mono neon $TRAVIS_BUILD_DIR/Bluzelle.NEO.Contract/bin/Debug/netcoreapp2.0/BluzelleContract.dll -nodebug
+  - mono neon.exe $TRAVIS_BUILD_DIR/Bluzelle.NEO.Contract/bin/Debug/netcoreapp2.0/BluzelleContract.dll -nodebug
   - tree $TRAVIS_BUILD_DIR
   - dotnet test

@@ -8,5 +8,5 @@ install:
 script:
   - dotnet restore
   - dotnet build
-  - ls $TRAVIS_BUILD_DIR/Bluzelle.NEO.Contract/bin/Debug/netcoreapp2.0
+  - tree -d $TRAVIS_BUILD_DIR
   - dotnet test

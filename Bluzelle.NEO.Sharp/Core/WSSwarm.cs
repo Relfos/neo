@@ -4,58 +4,42 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using WebSocketSharp;
+using Google.Protobuf;
+using System.IO;
+using System.Text;
 
 namespace Bluzelle.NEO.Sharp.Core
 {
-    public struct WSRequest
-    {
-        public enum Command
-        {
-            Create,
-            Read,
-            Update,
-            Remove
-        }
-
-        public Command command;
-        public Dictionary<string, string> data;
-        public string uuid;
-    }
-
     public class WSSwarm : ISwarm
     {
         private string url;
-        private int request_id;
+        private ulong request_id;
 
         public WSSwarm(string url)
         {
             this.url = url;
         }
 
-        private string BuildRequest(WSRequest request)
+        private string BuildRequest(bzn_msg msg, ulong txid,  string uuid)
         {
             var root = DataNode.CreateObject();
-            root.AddField("bzn-api", "crud");
-            root.AddField("cmd", request.command.ToString().ToLower());
+            msg.Db.Header = new database_header() { DbUuid = uuid, TransactionId = txid };
+            root.AddField("bzn-api", "database");
+            using (var output = new MemoryStream()) {
+                msg.WriteTo(output);
 
-            var node = DataNode.CreateObject("data");
-            foreach (var entry in request.data)
-            {
-                node.AddField(entry.Key, entry.Value);
+                var data = Convert.ToBase64String(msg.ToByteArray());
+                root.AddField("msg", data);
             }
-            root.AddNode(node);
-
-            root.AddField("db-uuid", request.uuid);
-            root.AddField("request-id", request_id);
 
             var json = JSONWriter.WriteToString(root);
 
             return json;
         }
 
-        private async Task<string> SendRequestToSocket(string json)
+        private async Task<database_response.Types.response> SendRequestToSocket(string json)
         {
-            string response = null;
+            byte[] response = null;
             bool failed = false;
 
             using (var ws = new WebSocket(url))
@@ -68,13 +52,13 @@ namespace Bluzelle.NEO.Sharp.Core
 
                 ws.OnMessage += (sender, e) =>
                 {
-                    response = e.Data;
+                    response = e.RawData;
                 };
 
-                /*ws.OnClose += (sender, e) =>
+                ws.OnClose += (sender, e) =>
                 {
-                    Console.WriteLine("closed socket");
-                };*/
+                  //  Console.WriteLine("closed socket");
+                };
 
 
                 System.IO.File.WriteAllText("dump.json", json);
@@ -99,95 +83,64 @@ namespace Bluzelle.NEO.Sharp.Core
                     }
                 }
 
-                return response;
+                using (var stream = new MemoryStream(response))
+                {
+                    var obj = database_response.Parser.ParseFrom(stream);
+                    if (obj.Redirect != null) {
+                        this.url = $"ws://{obj.Redirect.LeaderHost}:{obj.Redirect.LeaderPort}";
+
+                        return await SendRequestToSocket(json);
+                    }
+
+                    return obj.Resp;
+                }
+
             }
         }
 
-        private async Task<string> DoRequest(WSRequest request)
+        private async Task<database_response.Types.response> DoRequest(bzn_msg msg, string uuid)
         {
             request_id++;
 
-            var json = BuildRequest(request);
+            var json = BuildRequest(msg, request_id, uuid);
 
             var response = await SendRequestToSocket(json);
-
-            if (response == null)
-            {
-                return null;
-            }
-
-            var root = JSONReader.ReadFromString(response);
-            if (root.HasNode("error"))
-            {
-                var error = root.GetString("error");
-                if (error == "NOT_THE_LEADER")
-                {
-                    var data = root["data"];
-                    var leaderHost = data.GetString("leader-host");
-                    var leaderPort = data.GetInt32("leader-port");
-                    this.url = $"ws://{leaderHost}:{leaderPort}";
-
-                    return await SendRequestToSocket(json);
-                }
-            }
 
             return response;
         }
 
         public async Task<bool> Create(string uuid, string key, string value)
         {
-            var args = new Dictionary<string, string>();
-            args["key"] = key;
-            //args["value"] = Convert.ToBase64String(value);
-            args["value"] = value;
-
-            var request = new WSRequest() { command = WSRequest.Command.Create, data = args, uuid = uuid };
-            var response = await DoRequest(request);
-            return response != null && !response.Contains("error");
+            var msg = new bzn_msg() { Db = new database_msg() { Create = new database_create() { Key = key, Value = ByteString.CopyFrom(value, Encoding.UTF8) } } };
+            var response = await DoRequest(msg, uuid);
+            return response != null && !string.IsNullOrEmpty(response.Error);
         }
 
         public async Task<string> Read(string uuid, string key)
         {
-            var args = new Dictionary<string, string>();
-            args["key"] = key;
+            var msg = new bzn_msg() { Db = new database_msg() { Read = new database_read() { Key = key } } };
+            var response = await DoRequest(msg, uuid);
 
-            var request = new WSRequest() { command = WSRequest.Command.Read, data = args, uuid = uuid };
-            var json = await DoRequest(request);            
-            if (json == null)
-            {
+            if (response == null || !string.IsNullOrEmpty(response.Error)) {
                 return null;
             }
 
-            var root = JSONReader.ReadFromString(json);
-            if (root.HasNode("data"))
-            {
-                var data = root["data"];
-                return data.GetString("value");
-            }
-
-            return null;
+            return Encoding.UTF8.GetString(response.Value.ToByteArray());
         }
 
-        public async Task<bool> Remove(string uuid, string key)
+        public async Task<bool> Delete(string uuid, string key)
         {
-            var args = new Dictionary<string, string>();
-            args["key"] = key;
-
-            var request = new WSRequest() { command = WSRequest.Command.Remove, data = args, uuid = uuid };
-            var response = await DoRequest(request);
-            return response != null && !response.Contains("error");
+            var msg = new bzn_msg() { Db = new database_msg() { Delete = new database_delete() { Key = key } } };
+            var response = await DoRequest(msg, uuid);
+            return response != null && !string.IsNullOrEmpty(response.Error);
         }
 
         public async Task<bool> Update(string uuid, string key, string value)
         {
-            var args = new Dictionary<string, string>();
-            args["key"] = key;
-            args["value"] = value;
-            //args["value"] = Convert.ToBase64String(value);
-
-            var request = new WSRequest() { command = WSRequest.Command.Update, data = args, uuid = uuid };
-            var response = await DoRequest(request);
-            return response != null && !response.Contains("error");
+            var msg = new bzn_msg() { Db = new database_msg() { Update = new database_update() { Key = key, Value = ByteString.CopyFrom(value, Encoding.UTF8) } } };
+            var response = await DoRequest(msg, uuid);
+            var result = response == null || !string.IsNullOrEmpty(response.Error);
+            return result; 
         }
     }
 }

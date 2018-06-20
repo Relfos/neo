@@ -228,7 +228,7 @@ namespace Bluzelle.NEO.Sharp.Core
 
                 case 'D':
                     {
-                        this.swarm.Remove(uuid, key);
+                        this.swarm.Delete(uuid, key);
                         break;
                     }
             }

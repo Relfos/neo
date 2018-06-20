@@ -26,7 +26,7 @@ namespace Bluzelle.NEO.Tests
             return storage.ContainsKey(key) ? storage[key] : null;
         }
 
-        public async Task<bool> Remove(string uuid, string key)
+        public async Task<bool> Delete(string uuid, string key)
         {
             if (storage.ContainsKey(key))
             {

@@ -11,7 +11,8 @@ namespace Bluzelle.NEO.Helper
 
             var uuid = "92b8bac6-3242-452a-9090-1aa48afd71a3";
 
-            var swarm = new WSSwarm("ws://192.168.138.134:51010");
+            //var swarm = new WSSwarm("ws://192.168.138.134:51010");
+            var swarm = new WSSwarm("ws://13.78.131.94:51010");
 
             do
             {
@@ -105,7 +106,7 @@ namespace Bluzelle.NEO.Helper
                                 Console.Write("KEY: ");
                                 var key = Console.ReadLine();
 
-                                var result = swarm.Remove(uuid, key).GetAwaiter().GetResult();
+                                var result = swarm.Delete(uuid, key).GetAwaiter().GetResult();
                                 if (result)
                                 {
                                     Console.WriteLine("Removed!");

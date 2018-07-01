@@ -113,7 +113,7 @@ namespace Bluzelle.NEO.Sharp.Core
         {
             var msg = new bzn_msg() { Db = new database_msg() { Create = new database_create() { Key = key, Value = ByteString.CopyFrom(value, Encoding.UTF8) } } };
             var response = await DoRequest(msg, uuid);
-            return response != null && !string.IsNullOrEmpty(response.Error);
+            return response == null || !string.IsNullOrEmpty(response.Error);
         }
 
         public async Task<string> Read(string uuid, string key)

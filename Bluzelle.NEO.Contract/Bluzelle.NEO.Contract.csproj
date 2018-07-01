@@ -9,7 +9,8 @@
     <PackageReference Include="Neo.SmartContract.Framework" Version="2.7.3" />
   </ItemGroup>
 
-	<Target Name="CompileAVM">
+	<Target Name="AfterBuild">
+		<Message Text="Running AVM post-build compilation..."/>  
 		<Exec Condition=" '$(OS)' == 'Windows_NT'" Command="neon $(TargetDir)BluzelleContract.dll -nodebug"/>
 		<Exec Condition=" '$(OS)' != 'Windows_NT'" Command="mono neon.exe $(TargetDir)BluzelleContract.dll -nodebug"/>  
 	</Target>	

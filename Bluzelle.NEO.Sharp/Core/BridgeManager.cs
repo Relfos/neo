@@ -16,7 +16,6 @@ namespace Bluzelle.NEO.Sharp.Core
     public class BridgeManager : IBlockchainProvider
     {
         private NeoAPI neo_api;
-        private byte[] contract_bytecode;
         private UInt160 bluzelle_contract_hash;
         private bool running;
 
@@ -29,19 +28,13 @@ namespace Bluzelle.NEO.Sharp.Core
 
         private BigInteger lastRequestID = 0;
 
-        public BridgeManager(NeoAPI api, ISwarm swarm, string ownerWIF, string contractPath, uint lastBlock) : this(api, swarm, ownerWIF, File.ReadAllBytes(contractPath), lastBlock)
-        {
-
-        }
-
-        public BridgeManager(NeoAPI api, ISwarm swarm, string ownerWIF, byte[] contract_bytes, uint lastBlock)
+        public BridgeManager(NeoAPI api, ISwarm swarm, KeyPair owner_keys, UInt160 contract_hash, uint lastBlock)
         {
             this.neo_api = api;
             this.swarm = swarm;
-            this.owner_keys = KeyPair.FromWIF(ownerWIF);
+            this.owner_keys = owner_keys;
 
-            this.contract_bytecode = contract_bytes;
-            this.bluzelle_contract_hash = contract_bytecode.ToScriptHash();
+            this.bluzelle_contract_hash = contract_hash;
 
             this.listenerVM = new SnapshotVM(this);
 
@@ -77,8 +70,8 @@ namespace Bluzelle.NEO.Sharp.Core
                 {
                     while (lastBlock < currentBlock)
                     {
-                        lastBlock++;
                         ProcessIncomingBlock(lastBlock);
+                        lastBlock++;
 
                         if (!forever)
                         {
@@ -102,8 +95,10 @@ namespace Bluzelle.NEO.Sharp.Core
 
             if (block == null)
             {
-                throw new Exception($"API failure, could not fetch block #{height}");
+                return;
             }
+
+            Console.WriteLine($"Processing block {height}");
 
             foreach (var tx in block.transactions)
             {
@@ -137,17 +132,133 @@ namespace Bluzelle.NEO.Sharp.Core
                             continue;
                         }
 
-                        var engine = new ExecutionEngine(tx, listenerVM, listenerVM);
-                        engine.LoadScript(tx.script);
+                        Console.WriteLine($"Found Bluzelle call in tx {tx.Hash}");
 
-                        engine.Execute(null
-                            /*x =>
+                        var operation = Encoding.ASCII.GetString(ops[i - 1].data);
+
+                        int index = i - 3;
+                        var argCount = 1 + ((byte)ops[index].opcode - (byte)OpCode.PUSH1);
+                        var args = new List<object>();
+
+                        while (argCount > 0)
+                        {
+                            index--;
+                            if (ops[index].opcode >= OpCode.PUSHBYTES1 && ops[index].opcode <= OpCode.PUSHBYTES75)
                             {
-                                debugger.Step(x);
-                            }*/
-                            );
+                                args.Add(ops[index].data);
+                            }
+                            else
+                            if (ops[index].opcode >= OpCode.PUSH1 && ops[index].opcode <= OpCode.PUSH16)
+                            {
+                                var n = new BigInteger(1 + (ops[index].opcode - OpCode.PUSH1));
+                                args.Add(n);
+                            }
+                            else
+                            if (ops[index].opcode == OpCode.PUSH0)
+                            {
+                                args.Add(new BigInteger(0));
+                            }
+                            else
+                            if (ops[index].opcode == OpCode.PUSHM1)
+                            {
+                                args.Add(new BigInteger(-1));
+                            }
+                            else
+                            {
+                                throw new Exception("Invalid arg type");
+                            }
+                            argCount--;
+                        }
 
-                        ProcessRequests(tx);
+                        switch (operation)
+                        {
+                            case "create":
+                                {
+                                    try
+                                    {
+                                        var uuid = Encoding.ASCII.GetString((byte[])args[1]);
+                                        var key = Encoding.ASCII.GetString((byte[])args[2]);
+                                        var value = Encoding.ASCII.GetString((byte[])args[3]);
+
+                                        Console.WriteLine($"CREATE ({uuid},{key},{value})");
+                                        this.swarm.Create(uuid, key, value);
+                                    }
+                                    catch
+                                    {
+                                        Console.WriteLine($"Failed decoding args for tx {tx.Hash}");
+
+                                    }
+
+
+                                    break;
+                                }
+
+                            case "delete":
+                                {
+                                    try
+                                    {
+                                        var uuid = Encoding.ASCII.GetString((byte[])args[1]);
+                                        var key = Encoding.ASCII.GetString((byte[])args[2]);
+
+                                        Console.WriteLine($"DELETE ({uuid},{key})");
+                                        this.swarm.Delete(uuid, key);
+                                    }
+                                    catch
+                                    {
+                                        Console.WriteLine($"Failed decoding args for tx {tx.Hash}");
+
+                                    }
+
+
+                                    break;
+                                }
+
+                            case "update":
+                                {
+                                    try
+                                    {
+                                        var uuid = Encoding.ASCII.GetString((byte[])args[1]);
+                                        var key = Encoding.ASCII.GetString((byte[])args[2]);
+                                        var value = Encoding.ASCII.GetString((byte[])args[3]);
+
+                                        Console.WriteLine($"UPDATE ({uuid},{key},{value})");
+                                        this.swarm.Update(uuid, key, value);
+                                    }
+                                    catch
+                                    {
+                                        Console.WriteLine($"Failed decoding args for tx {tx.Hash}");
+
+                                    }
+
+
+                                    break;
+                                }
+
+                            case "read":
+                                {
+                                    try
+                                    {
+                                        var uuid = Encoding.ASCII.GetString((byte[])args[1]);
+                                        var key = Encoding.ASCII.GetString((byte[])args[2]);
+
+                                        Console.WriteLine($"READ ({uuid},{key})");
+                                        var val = this.swarm.Read(uuid, key);
+                                        /*
+                                        string id = null;
+                                        var push_tx = neo_api.CallContract(owner_keys, bluzelle_contract_hash, "push", new object[] {id, val });
+                                        neo_api.WaitForTransaction(owner_keys, push_tx);*/
+                                    }
+                                    catch
+                                    {
+//                                        Console.WriteLine($"Failed decoding args for tx {tx.Hash}");
+
+                                    }
+
+
+                                    break;
+                                }
+
+                        }
 
                         break;
                     }

@@ -6,7 +6,7 @@ namespace Bluzelle.NEO.Contract
 {
     public class BluzelleContract : SmartContract
     {
-        public static readonly byte[] Admin_Address = "AHKPx5dZYnwAweQUJQH3UefoswKm6beEz2".ToScriptHash();
+        public static readonly byte[] Admin_Address = "AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y".ToScriptHash();        
 
         private static readonly byte[] request_count_prefix = { (byte)'R', (byte)'E', (byte)'Q', (byte)'C' };
         private static readonly byte[] request_owner_prefix = { (byte)'R', (byte)'E', (byte)'Q', (byte)'O' };
@@ -86,6 +86,11 @@ namespace Bluzelle.NEO.Contract
                     if (args.Length != 1) return false;
                     BigInteger id = (BigInteger)args[0];
                     return API_Pull(id);
+                }
+
+                if (operation == "test")
+                {
+                    return "OK";
                 }
 
                 return false;

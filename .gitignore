@@ -2,3 +2,4 @@ packages/
 */bin/
 */obj/
 .vs/
+Bluzelle.NEO.Helper/Properties/launchSettings.json

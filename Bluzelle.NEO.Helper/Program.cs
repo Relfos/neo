@@ -23,7 +23,7 @@ namespace Bluzelle.NEO.Helper
             //var owner_keys = KeyPair.FromWIF("L3Vo5HcJhDoL7s81i4PSDTPfbUpVPrFHQ3V1GwSESkQtF4LW2vvJ");
             var owner_keys = KeyPair.FromWIF("KxDgvEKzgSBPPfuVfw67oPQBSjidEiqTHURKSDL1R7yGaGYAeYnr");
 
-            var contractFile = @"D:\code\crypto\BluzelleNeo\Bluzelle.NEO.Contract\bin\Debug\netcoreapp2.0\BluzelleContract.avm";
+            var contractFile = args[0];
             if (!File.Exists(contractFile))
             {
                 Console.WriteLine($"The file '{contractFile}' was not found");
@@ -42,6 +42,7 @@ namespace Bluzelle.NEO.Helper
                 Console.WriteLine("4 - Swarm.Delete");
                 Console.WriteLine("5 - Contract.Write");
                 Console.WriteLine("6 - Contract.Read");
+                Console.WriteLine("7 - Contract.Deploy");
 
                 int option;
                 
@@ -200,6 +201,25 @@ namespace Bluzelle.NEO.Helper
                                 break;
                             }
 
+
+                        case 7:
+                            {
+                                Console.WriteLine("**CONTRACT.DEPLOY**");
+
+                                var tx = api.DeployContract(owner_keys, contractBytes, new byte[] { 0x07, 0x10 }, 0x05, ContractPropertyState.HasStorage, "Bluzelle", "v1.0", "Bluzelle", "info@bluzelle.io", "contract");
+                                if (tx != null)
+                                {
+                                    Console.WriteLine($"Unconfirmed tx: {tx.Hash}");
+                                    api.WaitForTransaction(owner_keys, tx);
+                                    Console.WriteLine($"Confirmed tx: {tx.Hash}");
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Tx Failed!");
+                                }
+
+                                break;
+                            }
                     }
                 }
                 else

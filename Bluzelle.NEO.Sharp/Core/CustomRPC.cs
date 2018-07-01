@@ -9,7 +9,7 @@ namespace Bluzelle.NEO.Sharp.Core
     {
         private string host;
 
-        public CustomRPCNode(string host, int rpc_port, int neoscan_port) : base(rpc_port, $"{host}:{neoscan_port}")
+        public CustomRPCNode(string host, int rpc_port, int neoscan_port) : base(rpc_port, $"http://{host}:{neoscan_port}")
         {
             this.host = host;
         }

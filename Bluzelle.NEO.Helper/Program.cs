@@ -20,13 +20,15 @@ namespace Bluzelle.NEO.Helper
             var host = args.Length > 0 ? args[0] : "localhost";
             Console.WriteLine("Connecting to neo rpc at " + host);
             var api = new CustomRPCNode(host, 30333, 4000);
+          //  api.SetLogger(x => Console.WriteLine(x));
 
             Console.WriteLine("******Bluzelle Tool******");
 
             var uuid = "92b8bac6-3242-452a-9090-1aa48afd71a3";
 
             //var swarm = new WSSwarm("ws://192.168.138.134:51010");
-            var swarm = new WSSwarm("ws://13.78.131.94:51010");
+            //var swarm = new WSSwarm("ws://13.78.131.94:51010");
+            var swarm = new WSSwarm("ws://testnet.bluzelle.com:51010");
 
             //var owner_keys = KeyPair.FromWIF("L3Vo5HcJhDoL7s81i4PSDTPfbUpVPrFHQ3V1GwSESkQtF4LW2vvJ");
             var owner_keys = KeyPair.FromWIF("KxDgvEKzgSBPPfuVfw67oPQBSjidEiqTHURKSDL1R7yGaGYAeYnr");

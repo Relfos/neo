@@ -88,8 +88,8 @@ namespace Bluzelle.NEO.Bridge
 
             Console.WriteLine("Starting Bluzelle NEO bridge...");
 
-//            var swarm = new WSSwarm("ws://192.168.138.134:51010");
-            var swarm = new WSSwarm("ws://13.78.131.94:51010");
+            //            var swarm = new WSSwarm("ws://192.168.138.134:51010");
+            var swarm = new WSSwarm("ws://testnet.bluzelle.com:51010");
 
             // test public address = AHKPx5dZYnwAweQUJQH3UefoswKm6beEz2
             var manager = new BridgeManager(api, swarm, owner_keys, contractHash, lastBlock);

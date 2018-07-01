@@ -3,3 +3,4 @@ packages/
 */obj/
 .vs/
 Bluzelle.NEO.Helper/Properties/launchSettings.json
+BluzelleBridge/Properties/launchSettings.json

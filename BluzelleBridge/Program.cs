@@ -26,6 +26,12 @@ namespace Bluzelle.NEO.Bridge
     {
         static void Main(string[] args)
         {
+            if (args.Length < 2)
+            {
+                Console.WriteLine("syntax [rpc_host] [avm_path]");
+                return;
+            }
+
             var host = args.Length > 0 ? args[0] : "localhost";
             Console.WriteLine("Connecting to neo rpc at " + host);
             var api = new CustomRPCNode(host, 30333, 4000);
@@ -53,7 +59,7 @@ namespace Bluzelle.NEO.Bridge
 
             Console.WriteLine("Loading Bluzelle contract bytecode...");
 
-            var contractFile = @"D:\code\crypto\BluzelleNeo\Bluzelle.NEO.Contract\bin\Debug\netcoreapp2.0\BluzelleContract.avm";
+            var contractFile = args[1];
             if (!File.Exists(contractFile))
             {
                 Console.WriteLine($"The file '{contractFile}' was not found");

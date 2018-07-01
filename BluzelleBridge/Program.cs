@@ -7,15 +7,29 @@ using Neo.Lux.Cryptography;
 
 namespace Bluzelle.NEO.Bridge
 {
+    public class CustomRPCNode : NeoRPC
+    {
+        private string host;
+
+        public CustomRPCNode(string host, int rpc_port, int neoscan_port) : base(rpc_port, $"{host}:{neoscan_port}")
+        {
+            this.host = host;
+        }
+
+        protected override string GetRPCEndpoint()
+        {
+            return $"http://{host}:{port}";
+        }
+    }
+
     class Program
     {
         static void Main(string[] args)
         {
-            //var api = new LocalRPCNode(10332, "http://neoscan.io");
-            //var api = new RemoteRPCNode(10332, "http://neoscan.io");
-            //var api = new CustomRPCNode();
+            var host = args.Length > 0 ? args[0] : "localhost";
+            Console.WriteLine("Connecting to neo rpc at " + host);
+            var api = new CustomRPCNode(host, 30333, 4000);
 
-            var api = new LocalRPCNode(30333, "http://localhost:4000");
             var lastBlock = api.GetBlockHeight() - 1;
             if (lastBlock < 0) lastBlock = 0;
 

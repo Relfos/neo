@@ -11,9 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bluzelle.NEO.Helper", "Bluz
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bluzelle.NEO.Contract", "Bluzelle.NEO.Contract\Bluzelle.NEO.Contract.csproj", "{8EDD6BA3-6FC8-4CB3-A8D7-18D73E8239ED}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BluzelleTests", "BluzelleTests\BluzelleTests.csproj", "{762829B1-7A35-4B0F-9C89-5BD95F502306}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bluzelle.Protobuf", "Bluzelle.Protobuf\Bluzelle.Protobuf.csproj", "{64E7FCE1-A5FA-43D5-B50B-D90D7982C9C2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bluzelle.Protobuf", "Bluzelle.Protobuf\Bluzelle.Protobuf.csproj", "{64E7FCE1-A5FA-43D5-B50B-D90D7982C9C2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -37,10 +35,6 @@ Global
 		{8EDD6BA3-6FC8-4CB3-A8D7-18D73E8239ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8EDD6BA3-6FC8-4CB3-A8D7-18D73E8239ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8EDD6BA3-6FC8-4CB3-A8D7-18D73E8239ED}.Release|Any CPU.Build.0 = Release|Any CPU
-		{762829B1-7A35-4B0F-9C89-5BD95F502306}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{762829B1-7A35-4B0F-9C89-5BD95F502306}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{762829B1-7A35-4B0F-9C89-5BD95F502306}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{762829B1-7A35-4B0F-9C89-5BD95F502306}.Release|Any CPU.Build.0 = Release|Any CPU
 		{64E7FCE1-A5FA-43D5-B50B-D90D7982C9C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{64E7FCE1-A5FA-43D5-B50B-D90D7982C9C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{64E7FCE1-A5FA-43D5-B50B-D90D7982C9C2}.Release|Any CPU.ActiveCfg = Release|Any CPU

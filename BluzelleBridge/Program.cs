@@ -11,20 +11,27 @@ namespace Bluzelle.NEO.Bridge
     {
         static void Main(string[] args)
         {
-            if (args.Length < 2)
+            var settings = new Settings(args);
+
+            Console.WriteLine("Loading Bluzelle contract bytecode...");
+
+            var contractFile = settings.GetValue("avm.path");
+            if (!File.Exists(contractFile))
             {
-                Console.WriteLine("syntax [rpc_host] [avm_path]");
-                return;
+                Console.WriteLine($"The file '{contractFile}' was not found");
+                Environment.Exit(-1);
             }
 
-            var host = args.Length > 0 ? args[0] : "localhost";
-            Console.WriteLine("Connecting to neo rpc at " + host);
-            var api = new CustomRPCNode(host, 30333, 4000);
+            var contractBytes = File.ReadAllBytes(contractFile);
+            var contractHash = contractBytes.ToScriptHash();
+
+            var api = new CustomRPCNode(settings.GetValue("rpc.host", "localhost"), int.Parse( settings.GetValue("rpc.port", "30333")),
+                settings.GetValue("neoscan.host", "localhost"), int.Parse( settings.GetValue("neoscan.port", "4000")));
 
             var lastBlock = api.GetBlockHeight() - 1;
             if (lastBlock < 0) lastBlock = 0;
 
-     //       lastBlock = 20192;
+            lastBlock = uint.Parse(settings.GetValue( "block", lastBlock.ToString()));
 
             //var owner_keys = KeyPair.FromWIF("L3Vo5HcJhDoL7s81i4PSDTPfbUpVPrFHQ3V1GwSESkQtF4LW2vvJ");
             var owner_keys = KeyPair.FromWIF("KxDgvEKzgSBPPfuVfw67oPQBSjidEiqTHURKSDL1R7yGaGYAeYnr");            
@@ -41,18 +48,6 @@ namespace Bluzelle.NEO.Bridge
             {
                 Console.WriteLine(entry.Key + " => " + entry.Value);
             }
-
-            Console.WriteLine("Loading Bluzelle contract bytecode...");
-
-            var contractFile = args[1];
-            if (!File.Exists(contractFile))
-            {
-                Console.WriteLine($"The file '{contractFile}' was not found");
-                Environment.Exit(-1);
-            }
-
-            var contractBytes = File.ReadAllBytes(contractFile);
-            var contractHash = contractBytes.ToScriptHash();
 
             Console.WriteLine($"Searching for contract at address {contractHash.ToAddress()}...");
 
